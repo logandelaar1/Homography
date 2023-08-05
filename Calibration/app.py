@@ -92,8 +92,4 @@ def click_event():
 
 if __name__ == '__main__':
     # Image source
-    image_source = "/Users/logandelaar/Desktop/Screenshot 2023-07-19 at 6.09.55 AM.jpg"
-
-    image_stream = ImageStream(image_source)
-
-    app.run(debug=True)
+    # ADD CODE TO STREAM CAMERA
