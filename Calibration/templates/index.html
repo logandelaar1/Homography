@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Video Stream</title>
+    <style>
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        text-align: center;
+        font-family: Arial, sans-serif;
+        background-color: #1f1f1f;
+        color: #f0f0f0;
+        padding: 20px;
+      }
+
+      .video-container {
+        flex: 1 1 75%;
+        margin-right: 20px;
+        background-color: #1f1f1f;
+        border-radius: 6px;
+        box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+      }
+
+      .log-container {
+        flex: 1 1 25%;
+        text-align: left;
+        background-color: #2a2a2a;
+        border-radius: 6px;
+        box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+        padding: 20px;
+      }
+
+      img {
+        width: 100%;
+        height: auto;
+      }
+
+      .log-container label {
+        display: inline-block;
+        width: 120px;
+        margin-bottom: 6px;
+        color: #f0f0f0;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-bottom: 10px;
+        box-sizing: border-box;
+        background-color: #1f1f1f;
+        color: #f0f0f0;
+      }
+
+      input[type="submit"] {
+        padding: 10px 20px;
+        border: none;
+        background-color: #4CAF50;
+        color: #f0f0f0;
+        font-size: 16px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      input[type="submit"]:hover {
+        background-color: #45a049;
+      }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        var intervalID = setInterval(function () {
+          $("#video-feed").attr("src", "/video_feed?" + new Date().getTime());
+        }, 100);
+
+        var videoWidth, videoHeight;
+
+        function updateVideoSize() {
+          videoWidth = $("#video-feed")[0].naturalWidth;
+          videoHeight = $("#video-feed")[0].naturalHeight;
+
+          var containerWidth = $(".video-container").width();
+          var containerHeight = containerWidth * (videoHeight / videoWidth);
+
+          $(".video-container").height(containerHeight);
+        }
+
+        $("#video-feed").on("load", function () {
+          updateVideoSize();
+        });
+
+        $(window).resize(function () {
+          updateVideoSize();
+        });
+
+        $("#form-set").submit(function (e) {
+          e.preventDefault();
+
+          var x = $("#x").val();
+          var y = $("#y").val();
+
+          $.post("/set_dot_position", { x: x, y: y });
+        });
+
+        $("#form-log").submit(function (e) {
+          e.preventDefault();
+
+          var xDistance = $("#x-distance").val();
+          var yDistance = $("#y-distance").val();
+
+          $.post("/log_data", { xDistance: xDistance, yDistance: yDistance }, function () {
+            // Clear the text boxes
+            clearTextFields();
+          });
+        });
+
+        // Function to clear all text fields
+        function clearTextFields() {
+          $("#x").val("");
+          $("#y").val("");
+          $("#x-distance").val("");
+          $("#y-distance").val("");
+        }
+
+        // Load video metadata to get original size
+        var videoWidth, videoHeight;
+        $("<img/>")
+          .attr("src", $("#video-feed").attr("src"))
+          .on("load", function () {
+            videoWidth = this.width;
+            videoHeight = this.height;
+            updateVideoSize();
+          });
+
+        $("#video-feed").click(function (e) {
+          var img = $(this);
+          var offset = img.offset();
+          var x = e.pageX - offset.left;
+          var y = e.pageY - offset.top;
+
+          // Determine scale factors
+          var scaleX = videoWidth / img.width();
+          var scaleY = videoHeight / img.height();
+
+          // Normalize click coordinates
+          x = Math.round(x * scaleX);
+          y = Math.round(y * scaleY);
+
+          // Rounding the x and y to snap to the nearest grid intersection
+          var pxstep = 100; // This should be the same as in your draw_grid function
+          x = Math.round(x / pxstep) * pxstep;
+          y = Math.round(y / pxstep) * pxstep;
+
+          // Set the calculated coordinates as the values of the x and y input fields
+          $("#x").val(x);
+          $("#y").val(y);
+
+          // Send the coordinates to the server
+          $.post("/click_event", { x: x, y: y });
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div class="log-container">
+      <h2>Log Information</h2>
+      <form id="form-set">
+        <label for="x">X Coordinate:</label>
+        <input type="text" id="x" name="x" /><br />
+        <label for="y">Y Coordinate:</label>
+        <input type="text" id="y" name="y" /><br />
+        <input type="submit" value="Set Dot Position" />
+      </form>
+      <form id="form-log">
+        <label for="x-distance">X Distance:</label>
+        <input type="text" id="x-distance" name="x-distance" /><br />
+        <label for="y-distance">Y Distance:</label>
+        <input type="text" id="y-distance" name="y-distance" /><br />
+        <input type="submit" value="Submit" />
+      </form>
+    </div>
+    <div class="video-container">
+      <img id="video-feed" src="{{ url_for('video_feed') }}" />
+    </div>
+  </body>
+</html>
