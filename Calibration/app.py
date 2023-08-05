@@ -31,7 +31,6 @@ class ImageStream:
             cv2.line(frame, (0, y_px), (width, y_px), color=line_color, lineType=type_, thickness=thickness)
             cv2.putText(frame, str(y), (20, y_px - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.85, (0, 0, 0), thickness)
 
-    # ...rest of the class...
 
     def get_frame(self):
         frame = self.frame.copy()
