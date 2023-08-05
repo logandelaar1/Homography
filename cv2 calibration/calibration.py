@@ -15,7 +15,7 @@ objpoints = []  # 3D object points in real-world coordinates
 imgpoints = []  # 2D image points in image coordinates
 
 # Read calibration images
-image_folder = '/Users/logandelaar/Desktop/renamed/'
+image_folder = 'PATH/TO/IMAGES/'
 images = glob.glob(image_folder + '*.jpg')
 
 # Iterate over calibration images
