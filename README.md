@@ -1,21 +1,36 @@
-# Homography
-# Calibration
+# Calibration Project
 
-This document explains how to calibrate the camera using a web application designed specifically for this purpose. 
+This project is a multi-faceted application that uses computer vision libraries (cv2, numpy) for image processing and Flask for web application construction. It primarily handles the task of calibration, with two primary modules: an image streaming and interaction module and a homography calculation module. Authored by [Logan deLaar](https://github.com/Logandelaar1).
 
-## Procedure
+## Image Streaming and Interaction (`app.py`)
 
-1. **Use the website**: Open the website designed for calibration. 
+This module provides a simple web application that hosts a streaming image feed from a specified source (camera, static image). Users can interact with this feed in real time, plotting points and having their positions logged. 
 
-2. **Modify the script**: Add the necessary code to the bottom of the `app.py` script to connect the camera to the device. The specific code depends on the type of camera you're using, hence it's not included in the script. 
+Key components include:
 
-3. **Run the script and the web application**: Execute the `app.py` script and then open the web application.
+- The `ImageStream` class, which handles the acquisition and manipulation of the image stream. This includes drawing a grid on the image, setting dot positions, and preparing frames for the web interface.
+- A series of Flask routes that enable the logging of data points and the dynamic updating of the dot's position.
+- A template rendering route that serves the frontend.
 
-4. **Plot points and measure**: Plot points on the display shown on the web application and measure them in real life. Ensure that the camera is at the same orientation and height as it will be in real life. You should use a large, flat surface for measurement.
+## Frontend (`index.html`)
 
-5. **Perform random point tests**: Go through the process of selecting random points throughout the frame. Ensure these points are well distributed for best results. 
+The frontend of the application, written in HTML, CSS and JavaScript, provides an interface for users to interact with the image stream. They can manually enter coordinates to position a dot on the video feed, log the current dot position, and directly click on the video feed to move the dot. 
 
-6. **Update the homography script**: Open the `log.txt` file and transfer the data to the `homography.py` script. Replace the existing pixel coordinates and real-life coordinates with your data. The current setup is configured for a Raspberry Pi camera placed 11 inches perpendicular to the ground. The format for entering coordinates is `x1, y1, x2, y2...` and so on.
+## Homography Calculation (`homography.py`, `homography_sys.py`)
 
-7. **Run the homography script**: Once the coordinates have been added, execute the `homography.py` script. You should now have a calibrated system. For better accuracy, you can add more points.
+These scripts calculate a homography matrix based on predefined real-world coordinates and corresponding pixel coordinates. `homography.py` is an interactive script which allows users to input pixel coordinates and receive the corresponding real-world coordinates. `homography_sys.py` is a system-based version of the script that reads from command-line arguments.
 
+## Usage
+
+1. Run `app.py` to start the server.
+2. Open a web browser and navigate to `localhost:5000`.
+3. Interact with the video feed directly or use the form to position the dot.
+4. Log data as required.
+
+The homography scripts can be run directly from the command line, inputting the pixel coordinates as arguments in `homography_sys.py` or interactively in `homography.py`.
+
+## Future Work
+
+- Add code to stream from a live camera source.
+- Improve the calibration accuracy with additional tools.
+- Add an interface for defining the correspondence points for homography calculation.
