@@ -19,4 +19,3 @@ This document explains how to calibrate the camera using a web application desig
 
 7. **Run the homography script**: Once the coordinates have been added, execute the `homography.py` script. You should now have a calibrated system. For better accuracy, you can add more points.
 
-Happy calibrating!
